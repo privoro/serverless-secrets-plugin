@@ -10,6 +10,7 @@ const algorithm = 'aes-256-cbc';
 class ServerlessPlugin {
   constructor(serverless, options) {
     this.serverless = serverless;
+    this.serverless.config.servicePath = "../../Shared";
     this.options = options;
 
     const commandOptions = {
@@ -51,7 +52,7 @@ class ServerlessPlugin {
 
   encrypt() {
     return new BbPromise((resolve, reject) => {
-      const servicePath = "../../Shared";
+      const servicePath = this.serverless.config.servicePath;
       const credentialFileName = `secrets.${this.options.stage}.yml`;
       const encryptedCredentialFileName = `${credentialFileName}.encrypted`;
       const secretsPath = path.join(servicePath, credentialFileName);
@@ -72,7 +73,7 @@ class ServerlessPlugin {
 
   decrypt() {
     return new BbPromise((resolve, reject) => {
-      const servicePath = "../../Shared";
+      const servicePath = this.serverless.config.servicePath;
       const credentialFileName = `secrets.${this.options.stage}.yml`;
       const encryptedCredentialFileName = `${credentialFileName}.encrypted`;
       const secretsPath = path.join(servicePath, credentialFileName);
@@ -93,7 +94,7 @@ class ServerlessPlugin {
 
   checkFileExists() {
     return new BbPromise((resolve, reject) => {
-      const servicePath = "../../Shared";
+      const servicePath = this.serverless.config.servicePath;
       const credentialFileName = `secrets.${this.options.stage}.yml`;
       const secretsPath = path.join(servicePath, credentialFileName);
       fs.access(secretsPath, fs.F_OK, (err) => {
