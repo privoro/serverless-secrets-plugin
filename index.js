@@ -1,3 +1,6 @@
+/*jshint esversion:6*/
+/*jshint node:true*/
+
 'use strict';
 
 const fs = require('fs');
@@ -24,11 +27,16 @@ class ServerlessPlugin {
         shortcut: 'p',
         required: true,
       },
-      path: {
-        usage: 'Path to fetch/store the file',
-        shortcut: 'pa',
+      sourcePath: {
+        usage: 'Path to fetch the encrypted file',
+        shortcut: 'sp',
         required: false,
-      }     
+      },
+      destinationPath: {
+        usage: 'Path to store the encrypted file',
+        shortcut: 'dp',
+        required: false,
+      }            
     };
 
     this.commands = {
@@ -57,11 +65,12 @@ class ServerlessPlugin {
 
   encrypt() {
     return new BbPromise((resolve, reject) => {
-      const servicePath = `${this.options.path}` ? `${this.options.path}` : this.serverless.config.servicePath;
+      const sourcePath = this.serverless.config.servicePath;
+      const destinationPath = this.options.path ? this.options.path : this.serverless.config.servicePath;
       const credentialFileName = `secrets.${this.options.stage}.yml`;
       const encryptedCredentialFileName = `${credentialFileName}.encrypted`;
-      const secretsPath = path.join(servicePath, credentialFileName);
-      const encryptedCredentialsPath = path.join(servicePath, encryptedCredentialFileName);
+      const secretsPath = path.join(sourcePath, credentialFileName);
+      const encryptedCredentialsPath = path.join(destinationPath, encryptedCredentialFileName);
 
       fs.createReadStream(secretsPath)
         .on('error', reject)
@@ -78,11 +87,12 @@ class ServerlessPlugin {
 
   decrypt() {
     return new BbPromise((resolve, reject) => {
-      const servicePath = `${this.options.path}` ? `${this.options.path}` : this.serverless.config.servicePath;
+      const sourcePath = this.options.path ? this.options.path : this.serverless.config.servicePath;
+      const destinationPath = this.serverless.config.servicePath;
       const credentialFileName = `secrets.${this.options.stage}.yml`;
       const encryptedCredentialFileName = `${credentialFileName}.encrypted`;
-      const secretsPath = path.join(servicePath, credentialFileName);
-      const encryptedCredentialsPath = path.join(servicePath, encryptedCredentialFileName);
+      const secretsPath = path.join(destinationPath, credentialFileName);
+      const encryptedCredentialsPath = path.join(sourcePath, encryptedCredentialFileName);
 
       fs.createReadStream(encryptedCredentialsPath)
         .on('error', reject)
@@ -99,7 +109,7 @@ class ServerlessPlugin {
 
   checkFileExists() {
     return new BbPromise((resolve, reject) => {
-      const servicePath = `${this.options.path}` ? `${this.options.path}` : this.serverless.config.servicePath;
+      const servicePath = this.serverless.config.servicePath;
       const credentialFileName = `secrets.${this.options.stage}.yml`;
       const secretsPath = path.join(servicePath, credentialFileName);
       fs.access(secretsPath, fs.F_OK, (err) => {
