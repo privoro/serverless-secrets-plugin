@@ -29,12 +29,12 @@ class ServerlessPlugin {
       },
       sourcePath: {
         usage: 'Path to fetch the encrypted file',
-        shortcut: 'sp',
+        shortcut: 'f',
         required: false,
       },
       destinationPath: {
         usage: 'Path to store the encrypted file',
-        shortcut: 'dp',
+        shortcut: 'd',
         required: false,
       }            
     };
